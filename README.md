@@ -1,6 +1,4 @@
 # BoundDB
-BoundDB isn't a programming genius, but rather a concept for storing data and retrieving it faster and more accurately.
-
 
 **Introduction**
 To use you will need first add init.cpp in a folder and create a folder called "bound" and a subfolder called "db" and another subfolder in db called "tables"
