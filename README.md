@@ -1,2 +1,2 @@
 # BoundDB
-BoundDB is a new way of looking at databases
+BoundDB isn't a programming genius, but rather a concept for storing data and retrieving it faster and more accurately.
