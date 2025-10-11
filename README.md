@@ -31,3 +31,6 @@ You can see all the commands in the source, there are many more rules than those
 **Notes**
 Peoples ever sanitize it if you'll use to communicate with a client.
 I recommend using this when you need to store a lot of data and need few identifiers for that data. This database has specific rules that, if broken, can break all the data, but I use it daily, as it prevents several bugs. If you find one, you can notify other users and help fix it.
+
+**Dogecoin address**
+DAXqaA5XDMBEiDZai8jXV4drkLGS4m9MXM
