@@ -202,10 +202,10 @@ std::vector<std::string> parseP(const std::string&input){
     }
     return result;
 }
-int lock(){
+int lock(std::string loct){
     while(true){
-        if(!std::filesystem::exists("/media/bound/db/tables/lock.bd")){
-            std::ofstream outputFile("/media/bound/db/tables/lock.bd");
+        if(!std::filesystem::exists(loct)){
+            std::ofstream outputFile(loct);
             outputFile << "";
             outputFile.close();
             break;
@@ -258,20 +258,27 @@ std::string insertSafe(std::string pth,std::string tb){
         Acordei, um dia quente e ensolarado sem nuvens, aparentemente não choverá hoje, provavelmente amanhã fará mais calor, enquanto o dia passa parece que settei um loop, espero que esse seja somente um for curto e não um while true, lol
     */
 }
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cout << "Usage: /media/FileDash/bound <command>" << std::endl;
+        std::cout << "Usage: bound <command>" << std::endl;
         return 1;
     }
+    std::string loct_def="/media/bound/db/tables/";
     std::string command = argv[1];
     if(command=="help"){
-        std::cout<<"Commands: \n    create_table\n      /media/FileDash/bound create_table <NameTable> <[identifier1,identifier2...]>\n      "<<std::endl;
+        std::cout<<"Commands: \n    create_table\n      bound create_table <NameTable> <[identifier1,identifier2...]>\n      "<<std::endl;
     }else if(command=="create_table"){
         if(argc<4){
-            std::cout << "Usage: /media/FileDash/bound create_table <NameTable> <[name_identifier0...]>" << std::endl;
+            std::cout << "Usage: bound create_table <NameTable> <[name_identifier0...]>" << std::endl;
             return -1;
         }
-        lock();
+        if(argc==5){
+            std::stringstream gt;
+            gt<<"/media/bound/db/"<<argv[4]<<"/";
+            loct_def=gt.str();
+        }
+        lock(loct_def);
         std::string arg = argv[3];
         std::vector<std::string>arr=parse_dict(arg);
         arr[0].erase(std::remove(arr[0].begin(), arr[0].end(), '['), arr[0].end());
@@ -281,20 +288,20 @@ int main(int argc, char* argv[]) {
             wlt<<arr[i]<<"<!>";
         }
         std::string nameTable=argv[2];
-        if(!std::filesystem::exists("/media/bound/db/tables/")){
-            std::filesystem::create_directory("/media/bound/db/tables/");
+        if(!std::filesystem::exists(loct_def)){
+            std::filesystem::create_directory(loct_def);
         }
-        if(std::filesystem::exists("/media/bound/db/tables/"+nameTable+"/config.bd")){
+        if(std::filesystem::exists(loct_def+nameTable+"/config.bd")){
             std::cout << "This table already exists"<<std::endl;
             return 1;
         }
-        std::filesystem::create_directory("/media/bound/db/tables/"+nameTable);
+        std::filesystem::create_directory(loct_def+nameTable);
 
         std::stringstream nw;
         nw<<"{\"currensm\":\"md201\"<|>\"qty\":\"0\"<|>\"indza\":\"0\"<|>\"sizeKb\":\"0\"<|>\"identifier\":";
         nw<<wlt.str();
         nw<<"<|>}";
-        std::ofstream outputFile("/media/bound/db/tables/"+nameTable+"/config.bd");
+        std::ofstream outputFile(loct_def+nameTable+"/config.bd");
         outputFile << nw.str();
         outputFile.close();
         remove("/media/bound/db/tables/lock.bd");
@@ -302,8 +309,11 @@ int main(int argc, char* argv[]) {
     }
     else if (command=="insert") {
         if(argc<3){
-            std::cout << "Usage: /media/FileDash/bound insert table_name [identifier=value,column0=value...]" << std::endl;
+            std::cout << "Usage: bound insert table_name [identifier=value,column0=value...]" << std::endl;
             return -1;
+        }
+        if(argc==4){
+
         }
         std::string tableName=argv[2];
         if(!std::filesystem::exists("/media/bound/db/tables/"+tableName)){
@@ -425,7 +435,7 @@ int main(int argc, char* argv[]) {
             for (const auto& arg : dict) {
                 size_t endPos=arg.find(":^:");
                 if(endPos==std::string::npos||arg.substr(endPos)==":^:"){
-                    std::cout << "Usage: /media/FileDash/bound insert table_name [column0:^:value^|^column1:^:value...]0" << std::endl;
+                    std::cout << "Usage: bound insert table_name [column0:^:value^|^column1:^:value...]0" << std::endl;
                     std::string wis="/media/bound/db/tables/"+tableName+"/insert.bd";
                     remove(wis.c_str());
                     remove("/media/bound/db/tables/lock.bd");
@@ -493,7 +503,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="findMultiple"){
         if(argc<4){
-            std::cout << "Usage: /media/FileDash/bound findMultiple table [identification0,identification1...]" << std::endl;
+            std::cout << "Usage: bound findMultiple table [identification0,identification1...]" << std::endl;
             return 1;
         }
 
@@ -625,7 +635,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }else if(command=="find"){
         if(argc<4){
-            std::cout << "Usage: /media/FileDash/bound find table identification" << std::endl;
+            std::cout << "Usage: bound find table identification" << std::endl;
             return 1;
         }
         std::string tableName=argv[2];
@@ -1832,7 +1842,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="add_content_child"){
         if(argc!=5){
-            std::cout << "Usage: /media/FileDash/bound add_content_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <user:^:DarkSouls_23>|<comment:^:Hello>" << std::endl;
+            std::cout << "Usage: bound add_content_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <user:^:DarkSouls_23>|<comment:^:Hello>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -2096,7 +2106,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }else if(command=="findChild"){
         if(argc!=7){
-            std::cout << "Usage: /media/FileDash/bound findChild <NameTable> <Identification> <name_column_array0,name_column_array1...> <specify || all> <if specify: uuid_base elif all: -1>"<<std::endl;
+            std::cout << "Usage: bound findChild <NameTable> <Identification> <name_column_array0,name_column_array1...> <specify || all> <if specify: uuid_base elif all: -1>"<<std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -2292,12 +2302,12 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="erd_child"){
         if(argc!=8&&argc!=7&&argc!=9){
-            std::cout << "Usage: /media/FileDash/bound erd_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <uuid_base> <if edit: existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2... if removeParam: existent_parameter1 if removeValue: -1... if add_param_array: nw_param:^:new_parameter> <{edit or removeParam or removeValue or add_param_array}>"<<std::endl;
+            std::cout << "Usage: bound erd_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <uuid_base> <if edit: existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2... if removeParam: existent_parameter1 if removeValue: -1... if add_param_array: nw_param:^:new_parameter> <{edit or removeParam or removeValue or add_param_array}>"<<std::endl;
             return -1;
         }
         std::string opt=argv[6];
         if(((opt=="add_param_array"||opt=="remove_param_array")&&argc!=8)||(argc!=9&&(opt=="edit_param_array"||opt=="delete_param_array"))||(argc!=7&&(opt=="edit"||opt=="removeParam"||opt=="removeValue"))){
-            std::cout << "Usage: /media/FileDash/bound erd_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <uuid_base> <if edit: existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2... if removeParam: existent_parameter1 if removeValue: -1... if add_param_array: nw_param:^:new_parameter> <{edit or removeParam or removeValue or add_param_array}>"<<std::endl;
+            std::cout << "Usage: bound erd_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <uuid_base> <if edit: existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2... if removeParam: existent_parameter1 if removeValue: -1... if add_param_array: nw_param:^:new_parameter> <{edit or removeParam or removeValue or add_param_array}>"<<std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -2605,7 +2615,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="remove_param_colChild"){
         if(argc!=7){
-            std::cout << "Usage: /media/FileDash/bound edit_param_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <uuid_base> <existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2...>"<<std::endl;
+            std::cout << "Usage: bound edit_param_child <NameTable> <Identification> <name_column_array0,name_column_array1...> <uuid_base> <existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2...>"<<std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -2791,7 +2801,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="find_param_array"){
         if(argc!=6){
-            std::cout << "Usage: /media/FileDash/bound find_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
+            std::cout << "Usage: bound find_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -2953,7 +2963,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="edit_paramI_array"){
         if(argc!=6){
-            std::cout << "Usage: /media/FileDash/bound edit_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
+            std::cout << "Usage: bound edit_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -3557,7 +3567,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="edit_param_array"){
         if(argc!=7){
-            std::cout << "Usage: /media/FileDash/bound edit_param_array <NameTable> <Identification> <name_column_array> <base_identification> <user:^:DarkSouls_23>|<comment:^:Hello>" << std::endl;
+            std::cout << "Usage: bound edit_param_array <NameTable> <Identification> <name_column_array> <base_identification> <user:^:DarkSouls_23>|<comment:^:Hello>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -3837,7 +3847,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="removeI_array"){
         if(argc!=6){
-            std::cout << "Usage: /media/FileDash/bound edit_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
+            std::cout << "Usage: bound edit_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -4456,7 +4466,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="remove_array"){
         if(argc!=6){
-            std::cout << "Usage: /media/FileDash/bound edit_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
+            std::cout << "Usage: bound edit_param_array <NameTable> <Identification> <name_column_array,sub_name_column_array,sub_sub_name_column_array...> <uuid_base>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
@@ -5092,7 +5102,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="append_array"){
         if(argc<5){
-            std::cout << "Usage: /media/FileDash/bound append_array <NameTable> <Identification> <name_column_array>" << std::endl;
+            std::cout << "Usage: bound append_array <NameTable> <Identification> <name_column_array>" << std::endl;
             return -1;
         }
 
@@ -5296,7 +5306,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="pop_arrayKV"){
         if(argc<6){
-            std::cout << "Usage: /media/FileDash/bound pop_arrayKV <NameTable> <Identification> <column_array> <value_delete>" << std::endl;
+            std::cout << "Usage: bound pop_arrayKV <NameTable> <Identification> <column_array> <value_delete>" << std::endl;
             return 1;
         }
         std::string tableName=argv[2];
@@ -5475,7 +5485,7 @@ int main(int argc, char* argv[]) {
         }
     }else if(command=="update"){
         if(argc<4){
-            std::cout << "Usage: /media/FileDash/bound update <NameTable> <Identification> <existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2...>" << std::endl;
+            std::cout << "Usage: bound update <NameTable> <Identification> <existent_parameter1:^:newdata1>|<new_parameter1:^:newdata2...>" << std::endl;
             return -1;
         }
 
@@ -5751,7 +5761,7 @@ int main(int argc, char* argv[]) {
         return 0;
    }else if(command=="delete"){
         if(argc<4){
-            std::cout << "Usage: /media/FileDash/bound delete <NameTable> <Identifier>" << std::endl;
+            std::cout << "Usage: bound delete <NameTable> <Identifier>" << std::endl;
             return -1;
         }
         std::string tableName=argv[2];
